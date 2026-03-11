@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NFT BOBRS</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#0f172a;
+color:white;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+padding:20px 40px;
+background:#020617;
+align-items:center;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+}
+
+.balance{
+color:#22c55e;
+font-weight:bold;
+}
+
+nav button{
+margin-left:10px;
+padding:8px 16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.login{background:#3b82f6;color:white;}
+.profile{background:#8b5cf6;color:white;}
+.logout{background:#ef4444;color:white;}
+
+.hero{
+text-align:center;
+padding:40px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+padding:40px;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:12px;
+text-align:center;
+}
+
+.card img{
+width:100%;
+border-radius:10px;
+}
+
+.price{
+color:#22c55e;
+}
+
+.rarity{
+font-size:14px;
+}
+
+.create{
+display:block;
+margin:20px auto;
+padding:12px 25px;
+background:#f59e0b;
+border:none;
+border-radius:10px;
+cursor:pointer;
+color:white;
+}
+
+.profilePage{
+display:none;
+text-align:center;
+padding:40px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">NFT BOBRS</div>
+
+<div class="balance" id="balance">Balance: 10 ETH</div>
+
+<nav>
+<button class="login" onclick="login()">Login</button>
+<button class="profile" onclick="showProfile()">Profile</button>
+<button class="logout" onclick="logout()">Logout</button>
+</nav>
+
+</header>
+
+<section class="hero">
+<h1>NFT BOBRS</h1>
+<p>Create • Collect • Trade</p>
+</section>
+
+<section class="grid" id="market"></section>
+
+<button class="create" onclick="createNFT()">Create Random Bobr</button>
+
+<section class="profilePage" id="profile">
+
+<h2 id="username">Guest</h2>
+
+<div class="grid" id="inventory"></div>
+
+</section>
+
+<script>
+
+let currentUser=null
+let balance=10
+let nfts=[]
+let idCounter=1
+
+function updateBalance(){
+document.getElementById("balance").innerText="Balance: "+balance+" ETH"
+}
+
+function login(){
+
+let name=prompt("Username")
+
+if(name){
+currentUser=name
+document.getElementById("username").innerText=name
+}
+
+}
+
+function logout(){
+
+currentUser=null
+document.getElementById("username").innerText="Guest"
+
+}
+
+function showProfile(){
+
+let p=document.getElementById("profile")
+
+p.style.display=p.style.display==="block"?"none":"block"
+
+}
+
+function createNFT(){
+
+if(!currentUser){
+alert("Login first")
+return
+}
+
+let rarities=[
+{r:"Common",p:1},
+{r:"Rare",p:2},
+{r:"Epic",p:3},
+{r:"Legendary",p:5}
+]
+
+let r=rarities[Math.floor(Math.random()*rarities.length)]
+
+let colors=[
+"ff6b6b",
+"6bc5ff",
+"ffd93d",
+"9d6bff",
+"4ade80"
+]
+
+let bg=colors[Math.floor(Math.random()*colors.length)]
+
+let img=`https://placehold.co/300/${bg}/ffffff?text=BOBR+${idCounter}`
+
+addNFT("Bobr #"+idCounter,img,r.r,r.p)
+
+idCounter++
+
+}
+
+function addNFT(name,img,rarity,price){
+
+nfts.push({name,img,rarity,price})
+
+render()
+
+}
+
+function buyNFT(i){
+
+if(!currentUser){
+alert("Login first")
+return
+}
+
+let nft=nfts[i]
+
+if(balance<nft.price){
+alert("Not enough ETH")
+return
+}
+
+balance-=nft.price
+updateBalance()
+
+let card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<img src="${nft.img}">
+<h3>${nft.name}</h3>
+<div class="rarity">${nft.rarity}</div>
+`
+
+document.getElementById("inventory").appendChild(card)
+
+}
+
+function render(){
+
+let market=document.getElementById("market")
+market.innerHTML=""
+
+nfts.forEach((n,i)=>{
+
+let card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<img src="${n.img}">
+<h3>${n.name}</h3>
+<div class="rarity">${n.rarity}</div>
+<div class="price">${n.price} ETH</div>
+<button onclick="buyNFT(${i})">Buy</button>
+`
+
+market.appendChild(card)
+
+})
+
+}
+
+createNFT()
+createNFT()
+createNFT()
+
+</script>
+
+</body>
+</html>
